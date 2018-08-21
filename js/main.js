@@ -126,6 +126,8 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
+  ul.setAttribute("tabindex", "0");
+  ul.setAttribute("aria-label", "restaurants list");
   restaurants.forEach(restaurant => {
     ul.append(createRestaurantHTML(restaurant));
   });
@@ -137,8 +139,10 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
+  li.setAttribute("aria-label", "restaurant details");
 
   const image = document.createElement('img');
+  image.setAttribute("alt", `${restaurant.name}'s restaurant photo`);
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
   li.append(image);
@@ -156,6 +160,10 @@ createRestaurantHTML = (restaurant) => {
   li.append(address);
 
   const more = document.createElement('a');
+  more.setAttribute(
+    "aria-label",
+    restaurant.name + ", " + restaurant.neighborhood
+  );
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more)
@@ -176,3 +184,21 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 }
+
+/**
+ * Register Service Worker
+ * Make sure service worker is supported before trying to register one.
+ */
+if (navigator.serviceWorker) {
+  window.addEventListener('load', function() {
+      navigator.serviceWorker
+    .register('./sw.js', {scope: './'})
+    .then(function(registration) {
+        // Registration was successful
+        console.log('Service worker registered', registration);
+    })
+    .catch(function(err){
+        console.log(`Service worker not registered`);
+    });
+  });
+ }
